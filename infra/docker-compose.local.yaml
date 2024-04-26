@@ -1,0 +1,12 @@
+version: '3.9'
+
+services:  
+  postgres_db:
+    container_name: pglab4
+    image: postgres:16.1
+    environment:
+      POSTGRES_DB: ${db_postgres_name}
+      POSTGRES_USER: ${db_postgres_username}
+      POSTGRES_PASSWORD: ${db_postgres_password}
+    ports:
+      - "5432:5432"

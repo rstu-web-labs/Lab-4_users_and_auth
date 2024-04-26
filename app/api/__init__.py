@@ -1,0 +1,1 @@
+from app.api.router import main_router as router

@@ -1,0 +1,29 @@
+version: '3.9'
+
+services:  
+
+  postgres_db:
+    container_name:  ${db_postgres_name}
+    image: postgres:16.1
+    environment:
+      env_file: ../.env
+      POSTGRES_DB: ${db_postgres_name}
+      POSTGRES_USER: ${db_postgres_username}
+      POSTGRES_PASSWORD: ${db_postgres_password}
+    networks:
+      - mynetwork
+
+  app:
+    container_name: pglab4
+    image: mtsygikalo/lab3:v1.0
+    command:  python -m app.main
+    ports:
+      - 80:8000
+    networks:
+      - mynetwork
+    depends_on:
+      - postgres_db
+
+networks:
+  mynetwork:
+    driver: bridge
