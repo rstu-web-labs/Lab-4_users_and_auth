@@ -1,5 +1,7 @@
+import base64
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
+import hashlib
 
 import jwt
 from sqlalchemy import select
@@ -23,7 +25,7 @@ def try_registration(user:UserReg, session):
     if user_model.check_user_exists(session=session):
         return {'answear':'Пользователь уже зарегистрирован'}
     new_user = user_model.create_new_user(session=session)
-    return {'answear':'Пользователь успешно зарегистрирован'} if type(new_user) == UserModel else {'answear': new_user}
+    return {'answear':'Пользователь успешно зарегистрирован'}
 
 def create_access_token(data: dict, expires_delta: timedelta | None = app_settings.access_token_expire_minutes):
     to_encode = data.copy()
@@ -106,3 +108,32 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     if user is None:
         raise credentials_exception
     return user_dict
+
+def generate_confirmation_token(email: str, secret: str = app_settings.secret_key) -> str:
+    email_bytes = email.encode("utf-8")
+    email_base64 = base64.urlsafe_b64encode(email_bytes)
+    email_base64_str = email_base64.decode("utf-8").rstrip("=")
+
+    token_data = email_base64_str + secret
+    token_bytes = token_data.encode("utf-8")
+    token_hash = hashlib.sha256(token_bytes).hexdigest()
+
+    return f"{email_base64_str}-{token_hash}"
+
+def verify_confirmation_token(token: str, secret: str = app_settings.secret_key) -> str:
+    token_parts = token.split("-")
+    if len(token_parts) != 2:
+        raise ValueError("Invalid token format")
+    email_base64_str, token_hash = token_parts
+
+    email_base64_bytes = email_base64_str.encode("utf-8")
+    email_bytes = base64.urlsafe_b64decode(email_base64_bytes + b"==")
+    email = email_bytes.decode("utf-8")
+
+    token_data = email_base64_str + secret
+    token_bytes = token_data.encode("utf-8")
+    expected_hash = hashlib.sha256(token_bytes).hexdigest()
+    if token_hash != expected_hash:
+        raise ValueError("Invalid token")
+
+    return email

@@ -32,4 +32,10 @@ class UserModel(Base):
                 return user
             except IntegrityError as e:
                 session.rollback()
-                return {"IntegrityError:":e}
+                raise {"IntegrityError:":e}
+    
+    def change_user_status(self, status: bool, session:Session):
+        with session.begin():
+            user = session.execute(select(UserModel).filter(UserModel.email == self.email)).scalars().first()
+            user.status = status
+            session.commit()
