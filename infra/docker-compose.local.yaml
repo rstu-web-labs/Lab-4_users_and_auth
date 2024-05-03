@@ -10,3 +10,21 @@ services:
       POSTGRES_PASSWORD: ${db_postgres_password}
     ports:
       - "5432:5432"
+
+  rabbitmq:
+    container_name: rmlab4
+    image: rabbitmq:3.13.2-management-alpine
+    ports:
+      - "15672:15672" 
+    environment:
+      RABBITMQ_DEFAULT_USER: ${mq_user} 
+      RABBITMQ_DEFAULT_PASS: ${mq_pass}
+
+  celery:
+    container_name: cllab4
+    build: 
+      context: ..
+      dockerfile: ./infra/Dockerfile
+    command: celery -A app.email_task.task worker --loglevel=info
+    depends_on:
+      - rabbitmq

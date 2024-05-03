@@ -48,7 +48,6 @@ class DatabaseSettings(BaseSettings):
     db_postgres_timeout: PositiveInt = 5
     db_postgres_driver: Literal["psycopg", "pycopg2"] = "psycopg"
 
-
     @property
     def postgres_host_url(self):
         return (
@@ -61,8 +60,21 @@ class DatabaseSettings(BaseSettings):
     def postgres_database_url(self):
         return f"{self.postgres_host_url}{self.db_postgres_name}"
 
+class RabbitSettings(BaseSettings):
+    mq_user:str
+    mq_pass:str
+    mq_port:str  
+    mq_host:str
+
+    @property
+    def rabbit_url(self):
+        return f'amqp://{self.mq_user}:{self.mq_pass}@{self.mq_host}:{self.mq_port}//'
 
 class ExtraSettings(BaseSettings): ...
+
+class EmailSettings(BaseSettings):
+    email_pass:str
+    email_login:str
 
 class AuthSettings(BaseSettings):
     secret_key: str
@@ -70,7 +82,7 @@ class AuthSettings(BaseSettings):
     access_token_expire_minutes: PositiveInt
     refresh_token_expire_minutes: PositiveInt
 
-class Settings(DatabaseSettings, LoggingSettings, ExtraSettings, AuthSettings):
+class Settings(DatabaseSettings, LoggingSettings, ExtraSettings, AuthSettings, RabbitSettings, EmailSettings):
     app_title: str = "Short Url"
     app_description: str = APP_DESC
     mock_external_services: bool = False

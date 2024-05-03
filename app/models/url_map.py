@@ -1,8 +1,8 @@
-from sqlalchemy import Integer, String, DateTime, select
+from sqlalchemy import Integer, String, DateTime, select, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.sql import func
-from app.core.db import Base, Session
 
+from app.core.db import Base, Session
 
 class ShortUrl(Base):
     __tablename__="short_url"
@@ -10,14 +10,10 @@ class ShortUrl(Base):
     url = mapped_column(String(255), nullable=False, unique=True)
     short_url = mapped_column(String(8), nullable=False, unique=True)
     created_at = mapped_column(DateTime, nullable=False, default=func.now())
-    
-    
-# def create_database():
-#     if check_db_connection():
-#         Base.metadata.create_all(bind=engine)
-
-# def delete_tables():
-#     Base.metadata.drop_all(bind=engine)
+    user_id = mapped_column(ForeignKey('user.id', ondelete='cascade'))
+    __table_args__ = (
+        UniqueConstraint('short_url', 'user_id', name='uix_short_url_user_id'),
+    )
 
 def get_original_url(short_url, session:Session):
     with session.begin():
