@@ -23,9 +23,8 @@ def try_registration(user:UserReg, session):
         password = user.password
     )
     if user_model.check_user_exists(session=session):
-        return {'answear':'Пользователь уже зарегистрирован'}
+        raise {'answear':'Пользователь уже зарегистрирован'}
     new_user = user_model.create_new_user(session=session)
-    return {'answear':'Пользователь успешно зарегистрирован'}
 
 def create_access_token(data: dict, expires_delta: timedelta | None = app_settings.access_token_expire_minutes):
     to_encode = data.copy()

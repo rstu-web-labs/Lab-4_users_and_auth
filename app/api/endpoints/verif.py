@@ -10,8 +10,8 @@ router = APIRouter()
 def verif(verify_token:str, session:Session = Depends(get_session)):
     email = verify_confirmation_token(verify_token)
     user = UserModel(email=email)
-    if user.check_user_exists:
-        user.change_user_status(session) 
+    if user.check_user_exists(session):
+        user.change_user_status(status=True, session=session) 
         return {'amswear':'Почта подтверждена'} 
     else:
         raise {'massage':'Несуществующий пользователь'}
