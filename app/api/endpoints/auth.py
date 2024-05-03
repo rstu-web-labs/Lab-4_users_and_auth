@@ -3,8 +3,6 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.api.src import authenticate_user, create_access_token, create_refresh_token, decode_refresh_token
 from app.api.schema import Token, UserReg
 from app.core.db import get_session
-from app.core.settings import app_settings
-
 
 router = APIRouter()
 
@@ -29,7 +27,6 @@ def login_for_access_token(
         "refresh_token": refresh_token,
         "token_type": "bearer"
     }
-
 
 @router.post("/token/refresh")
 async def refresh_token(token:Token)->Token:

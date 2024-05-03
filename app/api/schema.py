@@ -14,6 +14,7 @@ class UserReg(BaseModel, Config):
 
 class User(BaseModel, Config):
     email:EmailStr
+    
 class UserInDB(User):
     hashed_password: str
 
