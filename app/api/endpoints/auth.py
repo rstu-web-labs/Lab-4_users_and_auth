@@ -6,7 +6,7 @@ from app.core.db import get_session
 
 router = APIRouter()
 
-@router.post("/token")
+@router.post("users/signin")
 def login_for_access_token(
     user: UserReg,
     session = Depends(get_session)
@@ -28,7 +28,7 @@ def login_for_access_token(
         "token_type": "bearer"
     }
 
-@router.post("/token/refresh")
+@router.post("/users/refresh")
 async def refresh_token(token:Token)->Token:
     refresh_token_data = decode_refresh_token(token.refresh_token)
     access_token_data = {

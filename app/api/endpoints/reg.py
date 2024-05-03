@@ -6,6 +6,6 @@ from app.core.db import get_session, Session
 
 router = APIRouter()
 
-@router.post('/registration')
+@router.post('users/registration')
 def registration(user:UserReg, session:Session = Depends(get_session))->RegistrationAnswear:
     return try_registration(user, session)
