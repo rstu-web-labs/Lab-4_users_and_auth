@@ -1,1 +1,2 @@
-from app.api.router import main_router as router
+from app.api.router import router as router
+from app.api.src import hash_password

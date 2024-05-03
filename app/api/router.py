@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 
-from app.api.endpoints import rout, reg_router
+from app.api.endpoints import rout, reg_router, auth_router
 
-main_router = APIRouter()
+router = APIRouter()
 
-main_router.include_router(rout,  prefix='/api/url')
-main_router.include_router(reg_router,  prefix='/api', tags=['Регистрация'])
-
+router.include_router(rout,  prefix='/api/url')
+router.include_router(reg_router,  prefix='/api', tags=['Регистрация'])
+router.include_router(auth_router, prefix='/api', tags=['Авторизация'])

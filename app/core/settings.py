@@ -68,6 +68,7 @@ class AuthSettings(BaseSettings):
     secret_key: str
     algorithm: str
     access_token_expire_minutes: PositiveInt
+    refresh_token_expire_minutes: PositiveInt
 
 class Settings(DatabaseSettings, LoggingSettings, ExtraSettings, AuthSettings):
     app_title: str = "Short Url"
