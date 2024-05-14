@@ -1,0 +1,78 @@
+version: "3.9"
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    restart: always
+    env_file: ../.env
+    environment:
+      POSTGRES_PASSWORD: ${DB_POSTGRES_PASSWORD}
+      POSTGRES_USER: ${DB_POSTGRES_USERNAME}
+      POSTGRES_DB: ${DB_POSTGRES_NAME}
+    volumes:
+      - postgres-db:/var/lib/postgresql
+    networks:
+      - backend
+
+  redis:
+    image: redis:6.0.7
+    container_name: redis
+    restart: always
+    command: redis-server --requirepass redis
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_DATABASES: ${CELERY_REDIS_DB}
+    networks:
+      - backend
+  app:
+    image: useruseruser2232323/url_app:latest
+    command: bash -c 'alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000'
+    env_file: ../.env
+    environment:
+      POSTGRES_HOST: postgres
+      REDIS_HOST: redis
+      POSTGRES_DELAY: 5
+    ports:
+      - 8005:8000
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - backend
+
+  celery_worker:
+    image: useruseruser2232323/url_celery:latest
+    command: bash -c 'celery --app=app.celery.worker.celery worker --concurrency=1 --loglevel=DEBUG '
+    env_file: ../.env
+    environment:
+      POSTGRES_HOST: postgres
+      REDIS_HOST: redis
+      POSTGRES_DELAY: 5
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - backend
+
+  celery_flower:
+    image: useruseruser2232323/url_flower:latest
+    ports:
+      - 5555:5555
+    command: bash -c "celery --app=app.celery.worker flower --port=5555"
+    env_file: ../.env
+    environment:
+      POSTGRES_HOST: postgres
+      REDIS_HOST: redis
+      POSTGRES_DELAY: 5
+    depends_on:
+      - celery_worker
+      - postgres
+      - redis
+    networks:
+      - backend
+volumes:
+  postgres-db:
+networks:
+  backend:
+    driver: bridge
