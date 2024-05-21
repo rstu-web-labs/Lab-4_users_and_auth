@@ -13,9 +13,3 @@ cp .example.env .env
 ```shell
 docker-compose --env-file .env -f infra/docker-compose.local.yaml up --build
 ```
-
-Чтобы развернуть сервис в режиме тестирования или Продакшн:
-
-```shell
-sudo docker-compose --env-file .env -f infra/docker-compose.yaml up
-```
