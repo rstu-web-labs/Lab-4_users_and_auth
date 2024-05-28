@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16.2
+    environment:
+      POSTGRES_DB: "${DB_POSTGRES_NAME}"
+      POSTGRES_USER: "${DB_POSTGRES_USERNAME}"
+      POSTGRES_PASSWORD: "${DB_POSTGRES_PASSWORD}"
+    env_file:
+      - .env
+    ports:
+      - "${DB_POSTGRES_PORT}:5432"
+
+  app:
+    image: ryksovv/url-app-service:v1.0
+    command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    env_file:
+      - ../.env
+    ports:
+      - "${APP_EXTERNAL_PORT}:8080"
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+        - 5672:5672
+        - 15672:15672
+
+  celery:
+    image: ryksovv/url-app-service:v1.0
+    command: celery -A app.tasks:celery_app worker --pool=solo -l info
+    env_file:
+      - ../.env
+    depends_on:
+      - rabbitmq
