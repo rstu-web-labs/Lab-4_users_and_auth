@@ -1,0 +1,1 @@
+from app.url.src import generate_short_link
