@@ -8,29 +8,51 @@ services:
       POSTGRES_USER: "${DB_POSTGRES_USERNAME}"
       POSTGRES_PASSWORD: "${DB_POSTGRES_PASSWORD}"
     env_file:
-      - .env
+      - ../.env
+    networks:
+      - new_network
+    volumes:
+      - postgres_vol:/var/lib/postgres_vol
     ports:
       - "${DB_POSTGRES_PORT}:5432"
 
   app:
-    image: ryksovv/url-app-service:v1.0
+    image: ryksovv/url_shotener:v1.0
     command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
     env_file:
       - ../.env
+    networks:
+      - new_network
     ports:
-      - "${APP_EXTERNAL_PORT}:8080"
+      - "${APP_EXTERNAL_PORT}:8000"
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: 'rabbitmq'
+    env_file:
+      - ../.env
+    networks:
+      - new_network
+    volumes:
+      - rabbitmq_vol:/var/lib/rabbitmq_vol
     ports:
-        - 5672:5672
-        - 15672:15672
+        - ${BROKER_PORT}:5672
+        - ${BROKER_PORT_2}:15672
 
   celery:
-    image: ryksovv/url-app-service:v1.0
-    command: celery -A app.tasks:celery_app worker --pool=solo -l info
+    image: ryksovv/url_shotener:v1.0
+    command: celery -A app.tasks:celery_app worker -l info
     env_file:
       - ../.env
     depends_on:
       - rabbitmq
+    networks:
+      - new_network
+
+volumes:
+  postgres_vol:
+  rabbitmq_vol:
+
+networks:
+  new_network:
+    driver: bridge

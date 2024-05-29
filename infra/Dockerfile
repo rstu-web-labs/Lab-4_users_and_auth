@@ -17,9 +17,9 @@ RUN pip install psycopg2-binary
 RUN pip install pydantic[email]
 RUN pip install pandas
 
+RUN pip install openpyxl
+
 COPY ./app ./app
 
 COPY alembic.ini ./
 COPY migrations ./migrations
-
-COPY config.py ./

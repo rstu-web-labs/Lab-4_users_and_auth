@@ -15,6 +15,7 @@ from app.tasks import send_confirmation_email
 from sqlalchemy.orm import Session
 import secrets
 from app.tasks import send_user_report
+from app.core.settings import SECRET_KEY, APP_EXTERNAL_PORT
 
 router = APIRouter()
 
@@ -64,7 +65,7 @@ async def create_url(url_in: UrlIn, db: Session = Depends(get_db), session_token
         db.rollback()
         raise HTTPException(status_code=400, detail="Не удалось создать URL")
 
-    share_url = f"http://localhost/api/url/{short_url}"
+    share_url = f"http://localhost:{APP_EXTERNAL_PORT}/api/url/{short_url}"
     if user_id:
         share_url += f"?u={user_id}"
 
@@ -117,7 +118,7 @@ async def email_verification(verify_token: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Пользователь не найден")
 
     secret_key = "secretkey"
-    if verify_token_signature(email_baseencode, signature, secret_key):
+    if verify_token_signature(email_baseencode, signature, SECRET_KEY):
         user.email_verified = True
         user.session_token = generate_session_token() 
         db.commit()
@@ -154,7 +155,7 @@ async def get_url_leaders(
         return {
             "url": item.url,
             "custom_url": item.short_url,
-            "share_url": f"http://localhost/api/url/{item.short_url}{user_part}",
+            "share_url": f"http://localhost:{APP_EXTERNAL_PORT}/api/url/{item.short_url}{user_part}",
             "user_id": item.user_id,
             "counter": item.click_count
         }

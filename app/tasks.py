@@ -5,15 +5,16 @@ from app.core.utils import send_email_with_attachment
 from app.core.utils import generate_user_report
 from app.core.db import SessionLocal
 from app.models.url_map import User
+from app.core.settings import SECRET_KEY, APP_EXTERNAL_PORT
 import os
+from app.core.celery_config import broker_url
 
-celery_app = Celery("tasks", broker="amqp://guest:guest@localhost:5672/")
+celery_app = Celery("tasks", broker=broker_url)
 
 @celery_app.task
 def send_confirmation_email(email):
-    secret_key = "secretkey"
-    verification_token = generate_verification_token(email, secret_key)
-    verification_link = f"http://localhost/api/users/email-verification/{verification_token}"
+    verification_token = generate_verification_token(email, SECRET_KEY)
+    verification_link = f"http://localhost:{APP_EXTERNAL_PORT}/api/users/email-verification/{verification_token}"
     email_subject = "Подтверждение адреса электронной почты"
     email_body = f"Для подтверждения адреса электронной почты перейдите по ссылке: {verification_link}"
     send_email(email, email_subject, email_body)

@@ -5,7 +5,7 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from config import DB_POSTGRES_HOST, DB_POSTGRES_USERNAME, DB_POSTGRES_PASSWORD, DB_POSTGRES_PORT, DB_POSTGRES_NAME
+from app.core.settings import DB_POSTGRES_HOST, DB_POSTGRES_USERNAME, DB_POSTGRES_PASSWORD, DB_POSTGRES_PORT, DB_POSTGRES_NAME
 from app.models.url_map import metadata
 
 # this is the Alembic Config object, which provides
