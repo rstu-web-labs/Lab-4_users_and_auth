@@ -5,6 +5,7 @@ services:
     container_name: pglab4
     image: postgres:16.1
     environment:
+      env_file: ./.env
       POSTGRES_DB: ${db_postgres_name}
       POSTGRES_USER: ${db_postgres_username}
       POSTGRES_PASSWORD: ${db_postgres_password}
@@ -19,6 +20,7 @@ services:
     ports:
       - "15672:15672" 
     environment:
+      env_file: ./.env
       RABBITMQ_DEFAULT_USER: ${mq_user} 
       RABBITMQ_DEFAULT_PASS: ${mq_pass}
     networks:
@@ -26,9 +28,7 @@ services:
 
   celery:
     container_name: cllab4
-    build: 
-      context: ..
-      dockerfile: ./infra/Dockerfile
+    image: mtsygikalo/lab4
     command: celery -A app.email_task.task worker --loglevel=info
     networks:
       - mynetwork
@@ -37,9 +37,7 @@ services:
 
   app:
     container_name: applab4
-    build: 
-      context: ..
-      dockerfile: ./infra/Dockerfile
+    image: mtsygikalo/lab4
     command: sh -c "alembic upgrade head && python3.11 -m app.main"
     ports:
      - 8080:8000

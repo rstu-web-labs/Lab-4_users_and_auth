@@ -27,7 +27,6 @@ def upgrade() -> None:
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('short_url'),
-    sa.UniqueConstraint('url')
     )
     # ### end Alembic commands ###
 

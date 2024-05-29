@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Literal
+import os
 
 from dotenv import load_dotenv
 from pydantic import PositiveInt
@@ -40,7 +41,7 @@ class LoggingSettings(BaseSettings):
 
 
 class DatabaseSettings(BaseSettings):
-    db_postgres_host: str
+    db_postgres_host: str = '0.0.0.0'
     db_postgres_port: str = '5432'
     db_postgres_name: str
     db_postgres_username: str
@@ -90,4 +91,3 @@ class Settings(DatabaseSettings, LoggingSettings, ExtraSettings, AuthSettings, R
 
 
 app_settings = Settings()
-

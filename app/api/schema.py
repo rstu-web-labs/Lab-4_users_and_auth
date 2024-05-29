@@ -6,6 +6,7 @@ class Config:
 class ShortURL(BaseModel, Config):
     url:str
     short_url:str
+    share_url:str | None
 
 class UserReg(BaseModel, Config):
     email: EmailStr
@@ -15,7 +16,7 @@ class UserReg(BaseModel, Config):
 class User(BaseModel, Config):
     email:EmailStr
     
-class UserInDB(User):
+class UserInDB(User, Config):
     hashed_password: str
 
 class RegistrationAnswear(BaseModel, Config):

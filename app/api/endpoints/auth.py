@@ -6,7 +6,7 @@ from app.core.db import get_session
 
 router = APIRouter()
 
-@router.post("users/signin")
+@router.post("/users/signin")
 def login_for_access_token(
     user: UserReg,
     session = Depends(get_session)

@@ -1,16 +1,17 @@
 import base64
 from datetime import datetime, timedelta, timezone
-from typing import Annotated
+from typing import Annotated, Optional
 import hashlib
 
 import jwt
+#from jose import jwt
 from sqlalchemy import select
 from passlib.context import CryptContext
 from fastapi import HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer
 
 from app.api.schema import UserReg, UserInDB
-from app.core.db import Session
+from app.core.db import Session, get_session
 from app.core.settings import app_settings  
 from app.models.user_map import UserModel
 
@@ -23,7 +24,7 @@ def try_registration(user:UserReg, session):
         password = user.password
     )
     if user_model.check_user_exists(session=session):
-        raise {'answear':'Пользователь уже зарегистрирован'}
+        return {'answear':'Пользователь уже зарегистрирован'}
     new_user = user_model.create_new_user(session=session)
 
 def create_access_token(data: dict, expires_delta: timedelta | None = app_settings.access_token_expire_minutes):
@@ -89,7 +90,9 @@ def decode_refresh_token(token: str):
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Invalid refresh token")
     
-def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+def get_current_user(token: Optional[str], session:Session):
+    if not token:
+        return None
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -102,8 +105,8 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
             raise credentials_exception
     except jwt.PyJWTError:
         raise credentials_exception
-    user = get_user(login=username)
-    user_dict = get_user_dict(user, username )
+    user = get_user(login=username, session=session)
+    user_dict = get_user_dict(user, username)
     if user is None:
         raise credentials_exception
     return user_dict
