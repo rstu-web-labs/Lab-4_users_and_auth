@@ -117,7 +117,6 @@ async def email_verification(verify_token: str, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
 
-    secret_key = "secretkey"
     if verify_token_signature(email_baseencode, signature, SECRET_KEY):
         user.email_verified = True
         user.session_token = generate_session_token() 
@@ -162,7 +161,7 @@ async def get_url_leaders(
     
     formatted_items = [format_item(item) for item in items]
     
-    base_url = "http://localhost/api/url-leaders"
+    base_url = "http://localhost:{APP_EXTERNAL_PORT}/api/url-leaders"
     previous_offset = max(0, offset - limit)
     next_offset = offset + limit
     
