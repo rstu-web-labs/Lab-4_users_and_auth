@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16.2
+    environment:
+      POSTGRES_DB: "${DB_POSTGRES_NAME}"
+      POSTGRES_USER: "${DB_POSTGRES_USERNAME}"
+      POSTGRES_PASSWORD: "${DB_POSTGRES_PASSWORD}"
+    env_file:
+      - .env
+    ports:
+      - "${DB_POSTGRES_PORT}:5432"
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+        - 5672:5672
+        - 15672:15672
