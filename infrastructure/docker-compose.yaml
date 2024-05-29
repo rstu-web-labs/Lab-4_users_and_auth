@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:16.2
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${DB_POSTGRES_DB}
+      POSTGRES_USER: ${DB_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${DB_POSTGRES_PASSWORD}
+    ports:
+      - ${DB_POSTGRES_PORT}:5432
+    volumes:
+      - ../postgres:/var/lib/postgresql/data
+
+  app:
+    image: fuyukaidesu/short_url:v1.0
+    command: sh -c "uvicorn app.main:app --host 0.0.0.0 --port 8080 --workers 4"
+    ports:
+      - 80:8000
+    depends_on:
+      - postgres
